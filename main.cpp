@@ -331,31 +331,31 @@ int main(int argc, char **argv) {
             //balloon and pin distance
             //note we don't use sqrt since dis <= 1 <-> dis^2 <=1 if real
             glm::vec3 pin = robot_stack[robot_stack.size() - 1]->transform.position;
-            if (dot(balloon_1->transform.position - pin, balloon_1->transform.position - pin) <= 1.0f) {
+            if (glm::dot(balloon_1->transform.position - pin, balloon_1->transform.position - pin) <= 1.0f) {
                 balloon_pop_1 = &add_object("Balloon1-Pop", 
                                             balloon_1->transform.position, 
                                             balloon_1->transform.rotation, 
                                             balloon_1->transform.scale);
                 balloon_1->transform.scale = glm::vec3(0.0f);
-                balloon_1->transform.transformation = glm::(0.0f, 0.0f, 50.0f);
+                balloon_1->transform.transformation = glm::vec3(0.0f, 0.0f, 50.0f);
                 popped[0] = true;
             }
-            if (dot(balloon_2->transform.position - pin, balloon_1->transform.position - pin) <= 1.0f) {
+            if (glm::dot(balloon_2->transform.position - pin, balloon_1->transform.position - pin) <= 1.0f) {
                 balloon_pop_2 = &add_object("Balloon2-Pop",
                     balloon_2->transform.position,
                     balloon_2->transform.rotation,
                     balloon_2->transform.scale);
                 balloon_2->transform.scale = glm::vec3(0.0f);
-                balloon_2->transform.transformation = glm::(0.0f, 0.0f, 50.0f);
+                balloon_2->transform.transformation = glm::vec3(0.0f, 0.0f, 50.0f);
                 popped[1] = true;
             }
-            if (dot(balloon_3->transform.position - pin, balloon_3->transform.position - pin) <= 1.0f) {
+            if (glm::dot(balloon_3->transform.position - pin, balloon_3->transform.position - pin) <= 1.0f) {
                 balloon_pop_3 = &add_object("Balloon2-Pop",
                     balloon_3->transform.position,
                     balloon_3->transform.rotation,
                     balloon_3->transform.scale);
                 balloon_3->transform.scale = glm::vec3(0.0f);
-                balloon_3->transform.transformation = glm::(0.0f, 0.0f, 50.0f);
+                balloon_3->transform.transformation = glm::vec3(0.0f, 0.0f, 50.0f);
                 popped[2] = true;
             }
 
