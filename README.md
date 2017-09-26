@@ -1,8 +1,8 @@
-NOTE: please fill in the first section with information about your game.
+<!-- NOTE: please fill in the first section with information about your game. -->
 
-# *Game Title*
+# *Robot Fun Police*
 
-*Game Title* is *Your Name*'s implementation of [*Design Document*](http://graphics.cs.cmu.edu/courses/15-466-f17/game2-designs/put-real-link-here) for game2 in 15-466-f17.
+*Robot Fun Police* is *Jia Zheng*'s implementation of [*Robot Fun Police*](http://graphics.cs.cmu.edu/courses/15-466-f17/game2-designs/jmccann/) for game2 in 15-466-f17.
 
 *Include a Screenshot Here*
 

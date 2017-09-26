@@ -10,6 +10,7 @@
 
 //Describes a 3D scene for rendering:
 struct Scene {
+
 	struct Transform {
 		Transform() = default;
 		Transform(Transform &) = delete;
@@ -46,6 +47,7 @@ struct Scene {
 		glm::mat4 make_local_to_world() const;
 		glm::mat4 make_world_to_local() const;
 	};
+
 	struct Camera {
 		Transform transform;
 		//camera parameters (perspective):
@@ -55,6 +57,7 @@ struct Scene {
 		//computed from the above:
 		glm::mat4 make_projection() const;
 	};
+
 	struct Object {
 		Transform transform;
 		//geometric info:
@@ -66,6 +69,7 @@ struct Scene {
 		GLuint program_mvp = -1U; //uniform index for MVP matrix
 		GLuint program_itmv = -1U; //uniform index for inverse(transpose(mv)) matrix
 	};
+
 	struct Light {
 		Transform transform;
 		//light parameters (directional):
@@ -77,4 +81,5 @@ struct Scene {
 	std::list< Light > lights;
 
 	void render();
+
 };
