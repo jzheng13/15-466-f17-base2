@@ -54,7 +54,7 @@ vertex_count = 0
 for name in to_write:
 	print("Writing '" + name + "'...")
     # get out of edit mode (just in case)
-	bpy.ops.object.mode_set(mode='OBJECT') 
+	# bpy.ops.object.mode_set(mode='OBJECT') 
 	assert(name in bpy.data.objects)
 	obj = bpy.data.objects[name]
 
@@ -126,7 +126,7 @@ print("Wrote " + str(blob.tell()) + " bytes to meshes.blob")
 # Export scene (object positions for every object on layer one)
 
 # (re-open file because we adjusted mesh users in the export above)
-bpy.ops.wm.open_mainfile(filepath='island.blend')
+bpy.ops.wm.open_mainfile(filepath='robot.blend')
 
 # strings chunk will have names
 strings = b''
