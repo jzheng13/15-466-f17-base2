@@ -18,13 +18,13 @@ bpy.ops.wm.open_mainfile(filepath='robot.blend')
 
 # names of objects whose meshes to write (not actual names of the meshes):
 to_write = [
-	'Balloon1',    
-	'Balloon1-Pop',
+    'Balloon1',    
+    'Balloon1-Pop',
     'Balloon1.001',
-	'Balloon2',
-	'Balloon2-Pop',
+    'Balloon2',
+    'Balloon2-Pop',
     'Balloon2.001',
-	'Balloon3',
+    'Balloon3',
     'Balloon3-Pop',
     'Balloon3.001',
     'Crate',
@@ -52,58 +52,61 @@ index = b''
 
 vertex_count = 0
 for name in to_write:
-	print("Writing '" + name + "'...")
+    print("Writing '" + name + "'...")
     # get out of edit mode (just in case)
-	# bpy.ops.object.mode_set(mode='OBJECT') 
-	assert(name in bpy.data.objects)
-	obj = bpy.data.objects[name]
+    # bpy.ops.object.mode_set(mode='OBJECT') 
+    assert(name in bpy.data.objects)
+    obj = bpy.data.objects[name]
 
     # make mesh single user, just in case it is shared with another object the 
     # script needs to write later.
-	obj.data = obj.data.copy() 
+    obj.data = obj.data.copy() 
 
-	# make sure object is on a visible layer:
-	bpy.context.scene.layers = obj.layers
-	# select the object and make it the active object:
-	bpy.ops.object.select_all(action='DESELECT')
-	obj.select = True
-	bpy.context.scene.objects.active = obj
+    # make sure object is on a visible layer:
+    bpy.context.scene.layers = obj.layers
+    # select the object and make it the active object:
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select = True
+    bpy.context.scene.objects.active = obj
 
-	# subdivide object's mesh into triangles:
-	bpy.ops.object.mode_set(mode='EDIT')
-	bpy.ops.mesh.select_all(action='SELECT')
-	bpy.ops.mesh.quads_convert_to_tris(quad_method='BEAUTY', ngon_method='BEAUTY')
-	bpy.ops.object.mode_set(mode='OBJECT')
+    # subdivide object's mesh into triangles:
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.mesh.quads_convert_to_tris(quad_method='BEAUTY', ngon_method='BEAUTY')
+    bpy.ops.object.mode_set(mode='OBJECT')
 
-	# compute normals (respecting face smoothing):
-	mesh = obj.data
-	mesh.calc_normals_split()
+    # compute normals (respecting face smoothing):
+    mesh = obj.data
+    mesh.calc_normals_split()
 
-	# record mesh name, start position and vertex count in the index:
-	name_begin = len(strings)
-	strings += bytes(name, "utf8")
-	name_end = len(strings)
-	index += struct.pack('I', name_begin)
-	index += struct.pack('I', name_end)
+    # record mesh name, start position and vertex count in the index:
+    name_begin = len(strings)
+    strings += bytes(name, "utf8")
+    name_end = len(strings)
+    index += struct.pack('I', name_begin)
+    index += struct.pack('I', name_end)
 
-	index += struct.pack('I', vertex_count)
-	index += struct.pack('I', len(mesh.polygons) * 3)
+    index += struct.pack('I', vertex_count)
+    index += struct.pack('I', len(mesh.polygons) * 3)
 
-	# write the mesh:
-	for poly in mesh.polygons:
-		assert(len(poly.loop_indices) == 3)
-		for i in range(0,3):
-			assert(mesh.loops[poly.loop_indices[i]].vertex_index == poly.vertices[i])
-			loop = mesh.loops[poly.loop_indices[i]]
-			vertex = mesh.vertices[loop.vertex_index]
-			for x in mesh.vertices[loop.vertex_index].co:
-				data += struct.pack('f', x)
-			for x in loop.normal:
-				data += struct.pack('f', x)
-	vertex_count += len(mesh.polygons) * 3
+    # write the mesh:
+    for poly in mesh.polygons:
+        assert(len(poly.loop_indices) == 3)
+        for i in range(0,3):
+            assert(mesh.loops[poly.loop_indices[i]].vertex_index == poly.vertices[i])
+            loop = mesh.loops[poly.loop_indices[i]]
+            vertex_color = mesh.vertex_colors.active.data[poly.loop_indices[i]]
+            vertex = mesh.vertices[loop.vertex_index]
+            for x in mesh.vertices[loop.vertex_index].co:
+                data += struct.pack('f', x)
+            for x in loop.normal:
+                data += struct.pack('f', x)
+            for x in vertex_color.color:
+                data += struct.pack('f', x)
+    vertex_count += len(mesh.polygons) * 3
 
 # check that we wrote as much data as anticipated:
-assert(vertex_count * (3 * 4 + 3 * 4) == len(data))
+assert(vertex_count * (3 * 4 + 3 * 4 + 3 * 4) == len(data))
 
 # write the data chunk and index chunk to an output blob:
 blob = open('../dist/meshes.blob', 'wb')
@@ -135,24 +138,24 @@ strings = b''
 name_begin = dict()
 name_end = dict()
 for name in to_write:
-	mesh_name = bpy.data.objects[name].data.name
-	name_begin[mesh_name] = len(strings)
-	strings += bytes(name, 'utf8')
-	name_end[mesh_name] = len(strings)
+    mesh_name = bpy.data.objects[name].data.name
+    name_begin[mesh_name] = len(strings)
+    strings += bytes(name, 'utf8')
+    name_end[mesh_name] = len(strings)
 
 # scene chunk will have transforms + indices into strings for name
 scene = b''
 for obj in bpy.data.objects:
-	if obj.layers[0] == False: continue
-	if not obj.data.name in name_begin:
-		print("WARNING: not writing object '" + obj.name + "' because mesh not written.")
-		continue
-	scene += struct.pack('I', name_begin[obj.data.name])
-	scene += struct.pack('I', name_end[obj.data.name])
-	transform = obj.matrix_world.decompose()
-	scene += struct.pack('3f', transform[0].x, transform[0].y, transform[0].z)
-	scene += struct.pack('4f', transform[1].x, transform[1].y, transform[1].z, transform[1].w)
-	scene += struct.pack('3f', transform[2].x, transform[2].y, transform[2].z)
+    if obj.layers[0] == False: continue # if object not in layer, skip
+    if not obj.data.name in name_begin:
+        print("WARNING: not writing object '" + obj.name + "' because mesh not written.")
+        continue
+    scene += struct.pack('I', name_begin[obj.data.name])
+    scene += struct.pack('I', name_end[obj.data.name])
+    transform = obj.matrix_world.decompose()
+    scene += struct.pack('3f', transform[0].x, transform[0].y, transform[0].z)
+    scene += struct.pack('4f', transform[1].x, transform[1].y, transform[1].z, transform[1].w)
+    scene += struct.pack('3f', transform[2].x, transform[2].y, transform[2].z)
 
 # write the strings chunk and scene chunk to an output blob:
 blob = open('../dist/scene.blob', 'wb')
