@@ -4,25 +4,21 @@
 
 *Robot Fun Police* is *Jia Zheng*'s implementation of [*Robot Fun Police*](http://graphics.cs.cmu.edu/courses/15-466-f17/game2-designs/jmccann/) for game2 in 15-466-f17.
 
-*Include a Screenshot Here*
-
-## Build Notes
-
-*Include any special notes or steps required to build your game here. If there are no special notes, delete this section.*
+![Game Screenshot](./screenshots/ss1.png)
 
 ## Asset Pipeline
 
-*Briefly describe the asset pipeline for this game. What sorts of source files are used? How are they processed? How are they loaded?*
+The assets used are the ones provided in the `robot.blend` file. Data were retrieved using the modified `export-meshes.py` Python script which grabs mesh information such as vertices, surface normals and colours as well as scene information, which were then exported into binary files. We load these files in the application.
 
 ## Architecture
 
-*Provide a brief introduction to how you implemented the design. Talk about the basic structure of your code.*
+Most of the models were loaded automatically, with the exception of the balloons and the robot. To simulate the hierarchy of the robot parts, we use a stack structure (represented with a vector) to store the different components of the robot. While the game is running and user input is recorded, the resulting transformation of the bottom-most robot part was perpetuated into its linked child components. We do the same for all child joints. Then, we calculate the displacement between the tip of the robot pin and the center of the balloons. We assume that the balloons are perfectly spherical to facilitate computation, and we "pop" a balloon if the tip of the robot arm lies within the bounds of the balloon.
 
 ## Reflection
 
-*Reflect on the assignment. What was difficult? What worked well? If you were doing it again, what would you change?*
+The main difficulty of the assignment lies in computing the transformation matrix of the individual parts after a rotation. I had difficulties in visualising the axes of rotation for each individual joint of the robot. The base of the robot rotates around its z-plane, and all the other links around their own x-plane. Nevertheless, I was perplexed on how to aggregate the rotations altogether. Additionally, as with the previous assignment, I was unsure of how to "remove" a model from the scene rendered. 
 
-*Reflect on the design document. What was clear and what was ambiguous? How did you resolve the ambiguities?*
+The design document was clear and I had no problems with it.
 
 
 # About Base2
