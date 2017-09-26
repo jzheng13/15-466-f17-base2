@@ -18,8 +18,9 @@ void Meshes::load(std::string const &filename, Attributes const &attributes) {
 		struct v3n3 {
 			glm::vec3 v;
 			glm::vec3 n;
+            glm::vec3 c;
 		};
-		static_assert(sizeof(v3n3) == 24, "v3n3 is packed");
+		static_assert(sizeof(v3n3) == 36, "v3n3 is packed");
 		std::vector< v3n3 > data;
 		read_chunk(file, "v3n3", &data);
 
@@ -46,6 +47,13 @@ void Meshes::load(std::string const &filename, Attributes const &attributes) {
 		} else {
 			std::cerr << "WARNING: loading v3n3 data from '" << filename << "', but not using the Normal attribute." << std::endl;
 		}
+        if (attributes.Colour != -1U) {
+            glVertexAttribPointer(attributes.Normal, 3, GL_FLOAT, GL_FALSE, sizeof(v3n3), (GLbyte *)0 + sizeof(glm::vec3));
+            glEnableVertexAttribArray(attributes.Normal);
+        }
+        else {
+            std::cerr << "WARNING: loading v3n3 data from '" << filename << "', but not using the Normal attribute." << std::endl;
+        }
 	}
 
 	std::vector< char > strings;

@@ -53,7 +53,7 @@ index = b''
 vertex_count = 0
 for name in to_write:
     print("Writing '" + name + "'...")
-    # get out of edit mode (just in case)
+    # get out of edit mode (just in case) - removed due to crash
     # bpy.ops.object.mode_set(mode='OBJECT') 
     assert(name in bpy.data.objects)
     obj = bpy.data.objects[name]
@@ -95,6 +95,7 @@ for name in to_write:
         for i in range(0,3):
             assert(mesh.loops[poly.loop_indices[i]].vertex_index == poly.vertices[i])
             loop = mesh.loops[poly.loop_indices[i]]
+            # Mesh.vertex_colors aligned with Mesh.loop thus same indices
             vertex_color = mesh.vertex_colors.active.data[poly.loop_indices[i]]
             vertex = mesh.vertices[loop.vertex_index]
             for x in mesh.vertices[loop.vertex_index].co:
